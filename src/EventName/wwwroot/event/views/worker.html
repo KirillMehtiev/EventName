@@ -1,0 +1,80 @@
+﻿<div>
+    <!-- List -->
+    <div ng-show="display">
+        <br />
+        <input type="button" class="btn btn-default pull-right" value="Admin" ng-click="changeView()"/>
+        <h2>People invited to EventName</h2>
+
+        <hr />
+        <div class="form-group">
+            <input ng-model="searchText" id="search" type="text" class="form-control" placeholder="Search for people" />
+        </div>
+        <div>
+            <div ng-repeat="category in categories">
+                <label class="radio-inline">
+                    <input type="radio" ng-model="selectFilter.mode" name="inlineRadioOptions" value="{{category.value}}"> {{category.lable}}
+                </label>
+            </div>
+        </div>
+        <hr />
+        <p ng-model="selectFilter"></p>
+        <div ng-show="!isBusy">
+            <div class="text-center">
+                <i class="fa fa-circle-o-notch fa-spin"></i> Loading...
+            </div>
+        </div>
+
+        <table class="table table-bordered" ng-show="isBusy">
+            <thead>
+                <tr>
+                    <th ng-repeat="head in tableHead">
+                        {{ head }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="person in people | personFilter: searchText:selectFilter.mode" id="row{{ person.id }}" ng-class="{success: person.isHere}">
+                    <td> {{ $index + 1 }}</td>
+                    <td> {{ person.firstName }}</td>
+                    <td> {{ person.lastName }} </td>
+                    <td> <input type="button" value="{{person.isHere ? 'Cansel' : 'Checkin'}}" class="btn btn-sm btn-primary" id="btn{{ person.id }}" ng-click="checkin(person)" /> </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- EndList -->
+
+    <!-- Admin -->
+    <div ng-show="!display">
+        <h2>Add new Person</h2>
+        <div class="well">
+            <div class="alert alert-success" ng-show="showMessage">
+                <span ng-model="message">{{message}}</span>
+            </div>
+            <form novalidate name="addPersonForm" ng-submit="addNewPerson()">
+                <div class="form-group">
+                </div>
+                <div class="form-group">
+                    <label for="name" class="control-label">First Name</label>
+                    <input type="text" id="name" name="name" class="form-control" ng-model="firstName" required />
+                    <span ng-show="addPersonForm.name.$error.required" class="text-warning">First name is required</span>
+                </div>
+                <div class="form-group">
+                    <label for="lname" class="control-label">Last Name</label>
+                    <input type="text" id="lname" name="lname" class="form-control" ng-model="lastName" required />
+                    <span ng-show="addPersonForm.lname.$error.required" class="text-warning">Last name is required</span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Add Person" class="btn btn-primary" ng-disabled="addPersonForm.$invalid" />
+                </div>
+                <hr />
+                <div class="form-group">
+                    <input type="button" value="Clean list [delete all data from db]" class="btn btn-danger" ng-click="cleanList()" />
+                    <input type="button" value="Go to list" class="btn btn-primary pull-right" ng-click="changeView()" />
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <!-- End admin -->
+</div>
