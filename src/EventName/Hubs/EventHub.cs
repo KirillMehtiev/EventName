@@ -27,12 +27,7 @@ namespace EventName.Hubs
 
         public void GetData()
         {
-            try
-            {
-                var list = _context.People.ToList<Person>();
-                Clients.Caller.getPeople(list); // caller
-            }
-            catch { } // todo: show error page
+            Clients.Caller.getPeople(Data());
         }
         public async void UpdatePerson(Person updPerson)
         {
@@ -55,12 +50,16 @@ namespace EventName.Hubs
                 IsHere = false
             };
 
-            // todo add to bd
-            _context.People.Add(person);
-            await _context.SaveChangesAsync();
+            try
+            {
+                // add to bd
+                _context.People.Add(person);
+                await _context.SaveChangesAsync();
+            }
+            catch { }
 
-            // todo triger update on conneted clients
-            Clients.All.addPerson(null);
+            // triger update on conneted clients
+            Clients.All.addPerson(person);
 
         }
 
@@ -73,6 +72,21 @@ namespace EventName.Hubs
             }
 
             _context.SaveChanges();
+
+            Clients.All.getPeople(Data());
+        }
+
+        private IList<Person> Data()
+        {
+            List<Person> list = null;
+
+            try
+            {
+                list = _context.People.ToList<Person>();
+            }
+            catch {  }
+
+            return list;
         }
 
     }

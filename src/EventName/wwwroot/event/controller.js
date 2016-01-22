@@ -110,7 +110,7 @@ eventApp.controller('eventController', ["$scope", "$rootScope", "$timeout", "bac
         $scope.lastName;
 
         // for alert purpose
-        $scope.message = "A new person has been added!";
+        $scope.message = "";
         $scope.showMessage = false;
 
         // click add
@@ -123,16 +123,28 @@ eventApp.controller('eventController', ["$scope", "$rootScope", "$timeout", "bac
             $scope.lastName = "";
 
             // show 3 sec and then hide message
-            $scope.showMessage = true;
-            $timeout(function () {
-                $scope.showMessage = false;
-            }, 3000);
+            displayMessage("A new person has been added!");
 
         }
 
+        // click 
         $scope.cleanList = function () {
-            myHub.server.cleanList();
-            alert("Done!")
+            
+            var answer = confirm("Do you really want to delete all data from list?");
+
+            if (answer == true) {
+                myHub.invoke("cleanList");
+                displayMessage("All data deleted from list");
+            }
+        }
+
+        var displayMessage = function (msg) {
+            $scope.showMessage = true;
+            $scope.message = msg;
+
+            $timeout(function () {
+                $scope.showMessage = false;
+            }, 3000);
         }
     }
 ]);
