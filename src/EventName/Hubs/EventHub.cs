@@ -60,7 +60,7 @@ namespace EventName.Hubs
             await _context.SaveChangesAsync();
 
             // todo triger update on conneted clients
-            Clients.All.addPerson(person);
+            Clients.All.addPerson(null);
 
         }
 

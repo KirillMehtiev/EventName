@@ -2,7 +2,7 @@
 
 eventApp.controller('eventController', ["$scope", "$rootScope", "$timeout", "backendHubProxy",
     function ($scope, $rootScope, $timeout, backendHubProxy) {
-        
+
         // start out connection
         var myHub = backendHubProxy("eventHub", function () {
             // this func will be executed inside connection.start().done( HERE )
@@ -37,10 +37,15 @@ eventApp.controller('eventController', ["$scope", "$rootScope", "$timeout", "bac
         $scope.tableHead = ["#", "First Name", "Last Name", "Chekin"];
         $scope.people = [];
 
+        $scope.showError = false;
+        $scope.errorMessage = "";
+
         // add client-side method to hub
         myHub.on("getPeople", function (data) {
-            $scope.people = data;
-            $scope.isBusy = true;
+            if (checkReceivedData(data)) {
+                $scope.people = data;
+                $scope.isBusy = true;
+            }
             $rootScope.$apply();
         });
 
@@ -50,23 +55,19 @@ eventApp.controller('eventController', ["$scope", "$rootScope", "$timeout", "bac
         });
 
         // when admin added new person list will be updated on clients
-        myHub.on("addPerson", function (newPerson) {
-            $scope.people.push(newPerson);
+        myHub.on("addPerson", function (person) {
+            if (checkReceivedData(person)) {
+                $scope.people.push(person);
+            }
             $rootScope.$apply();
         })
 
         // click ckeckin()
         $scope.checkin = function (person) {
             var updPerson = updatePersonLocaly(person, $scope.people);
-            // sent to other connected clients
+            // send to other connected clients
             myHub.invoke("updatePerson", updPerson);
         }
-
-        // add new person to list
-        myHub.on("addPerson", function (person) {
-            $scope.people.push(person);
-            $rootScope.$apply();
-        });
 
         // get person and list of people
         // find person by id and change his prop (isHere)
@@ -88,6 +89,18 @@ eventApp.controller('eventController', ["$scope", "$rootScope", "$timeout", "bac
                     }
                 }
             }
+        }
+
+        // check data and if needed display message
+        var checkReceivedData = function (data) {
+            if ((data == 'undefined') || (data == null)) {
+                $scope.errorMessage = "Some troubles occurred while updating or getting data. Click Refresh!"
+                $scope.showError = true;
+                $scope.isBusy = true;
+                return false;
+
+            } else return true;
+
         }
 
         // ------ Admin view ------
