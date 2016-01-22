@@ -3,7 +3,7 @@
 eventApp.filter("personFilter", function () {
     return function (people, textSearch, filter) {
 
-        // todo: rewrite into single loop |filterByMode + filterByFullName|
+        // create Checked/Unchecked list 
         var filterByMode = function (list, filter) {
             var listToBack = [];
             for (var i = 0; i < list.length; i++) {
@@ -16,6 +16,7 @@ eventApp.filter("personFilter", function () {
             return listToBack;
         }
 
+        // search for any matches in firstName and lastName
         var filterByFullName = function (listToSearch) {
 
             if (textSearch != "") {
